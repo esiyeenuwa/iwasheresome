@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="jquery.mobile-1.4.4.min.css">
+	<script src="jquery-1.11.1.js"></script>
+        <script>src="schscript.js"</script>
+	<script src="jquery.mobile-1.4.4.min.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script src="barcodescanner.js"></script>
+   
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+
+<!--<script type="text/javascript" src="jquery.qrcode.min.js"></script>
+--><script type="text/javascript" src="src/jquery.qrcode.js"></script>
+<script type="text/javascript" src="src/qrcode.js"></script>
+
+
+
+
+
+                <script>
+document.addEventListener("deviceready",
+init);
+
+
+var resultDiv;
+function init(){
+$("#barcodescanner").on("click",function(){
+startScan();
+});
+resultDiv
+=
+document.querySelector("#results");
+}
+
+function startScan()
+{
+cordova.plugins.barcodeScanner.scan(
+function(result){
+var s ="Result:"+result.text+"<br/>"+
+	   "Format:"+result.format+"<br/>"+
+	   "Cancelled:"+result.cancelled;
+	   resultDiv.innerHTML=s;
+},
+
+function(error){
+alert("Scanning failed:"+ error);
+}
+);
+}
+</script>
+	<script>
+	
+        
+        var email;
+        var code;
+        
+        
+		function syncAjax(u){
+                    var obj=$.ajax(
+			{url:u,
+			 async:false
+			 }
+			);
+                    return $.parseJSON(obj.responseText);
+				
+		}
+	
+		function changeConductor(){
+		
+			var idd=$("#select-conductor").val();	
+			var u="events_action.php?cmd=1&id="
+				+idd;
+				
+                        var r=syncAjax(u);
+                        console.log(r);
+                        //location.reload();
+		}
+                
+               
+                function checkUser(){
+                   var mail=$("#email").val();
+                    var myid=$("#code").val();
+                    
+                    var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=1&email="+mail+"&code="+myid;
+                    alert(u);
+                    var r=syncAjax(u);
+                    if(r.result==0){
+                        alert("An error occured");
+                    }
+                    var tempemail;
+                    var tempcode;
+                    for(i=0;i<r.user.length;i++){
+                    
+                    
+                     tempemail=r.user[i].uemail;
+                   // console.log(tempemail);
+                     tempcode=r.user[i].ucode;
+                    //console.log(tempcode);
+                }
+                    if (mail == tempemail && myid ==tempcode ) {
+				$("#status").fadeTo(500,1, function() { $(this).html("Success! Loading Passenger's Page...").fadeTo(5000,0,function() {location.href="#pagetwo"}); })
+				$("#myashid").val("");
+				 $("#mypword").val("");
+                                 email=tempemail;
+                                 myid=tempcode;
+                                 code=tempcode
+                                  mylist();
+					}
+					//Message displayed if username or password is not correct
+					else{
+						$("#status").fadeTo(500,1, function() { $(this).html("Invalid email or verification code").fadeTo(5000,0,function() {location.href="#this"}); })
+						$("#myashid").val("");
+						 $("#mypword").val("");
+					}
+                   
+                
+                }
+                
+                
+
+               
+    
+    
+             function mylist(){ 
+ 
+                var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=2";
+					
+		var r=syncAjax(u);
+			
+		if(r.result==0){
+			$("divStatus").text(r.message);
+                        return;
+                        var i=0;
+                }
+                for(i=0;i<r.event.length;i++){
+				//$("#myList").text(r.person[i].username);
+				
+                var parent = document.getElementById('listview');
+                var listItem = document.createElement('li');
+                listItem.setAttribute('id','listitem');
+			
+			var name=r.event[i].pname;
+                       // var pid=r.event[i].pid;
+                        var description=r.event[i].pdescription;
+                         //alert(name);
+			//alert(r.person[i].aid);
+            
+                listItem.innerHTML='<a href="#pagefive" OnClick="myDetails(\'' + name + '\')"><h3>'+name+"</h3><p>"+description+'</p></a>';
+          
+                parent.appendChild(listItem);
+			//$("#listview").trigger('create');
+			//( "#listview" ).listview("refresh")	
+			//$( '#listview' ).listview().listview('refresh');
+			   var list = document.getElementById('listview');
+                $(list).listview().listview("refresh");
+			}
+            }
+
+
+            function myDetails(name){
+                     
+                        var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=3&pid="+name;
+					
+			var r=syncAjax(u);
+			
+			if(r.result==0){
+				$("divStatus").text(r.message);
+				return;
+			
+			}
+                        var i=0;
+                        var pid;var name;var date;var location; var contact;var description;
+			//for(i=0;i<r.event.length;i++){
+                        
+                       // pid=r.event[i].pid;
+                        name=r.event[i].pname;
+                        date=r.event[i].pdate;
+                        location=r.event[i].plocation;
+                        contact=r.event[i].pphone;
+                        description=r.event[i].pdescription; 
+                       // }
+                        alert(name+" "+date+" "+location+" "+contact+" "+description);
+                        $("#ename").val(name);
+                        $("#date").val(date);
+                        $("#location").val(location);
+                        $("#contact").val(contact);
+                        $("#description").val(description);
+             
+             }
+             
+             
+             
+            function randomString() {
+                var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+                var string_length = 3;
+                var randomstring = '';
+                for (var i=0; i<string_length; i++) {
+                	var rnum = Math.floor(Math.random() * chars.length);
+                	randomstring += chars.substring(rnum,rnum+1);
+                }
+                return randomstring;
+            }
+             
+             
+             
+             
+            function register(){
+              var myName= $("#myName").val();
+              var myEmail=$("#myEmail").val();
+              var phoneNo=$("#phoneNo").val();
+              var organisation=$("#organisation").val();
+              if(myName==""||myEmail==""||phoneNo==""||organisation==""){
+                 
+                  $("#statussix").fadeTo(500,1, function() { $(this).html("Please fill all fields").fadeTo(5000,0,function() {location.href="#pagesix"}); })
+                 return; 
+                }
+             
+                  if(phonenumber()){
+                      if(ValidateEmail()){
+                      phoneNo=phoneNo.substring(1); 
+                      var randomNo=randomString();
+                      alert(randomNo);
+                      
+                     var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=5&name="+myName+"&email="+myEmail+"&contact="+phoneNo+"&organisation="+organisation+"&random="+randomNo;
+                     alert(u);
+                     var r=syncAjax(u);
+                      }
+                      else{
+                          return false;
+                      }
+                  }
+                  else{
+                      return false;
+                  }   
+            
+               
+             }
+             
+             //reference www.w3resource.com           
+        function phonenumber()  {
+
+                 var phoneNo=$("#phoneNo").val();
+                 var phoneno = /^\d{10}$/;  
+                if(phoneNo.match(phoneno))  
+                    {  
+          
+                        return true;  
+        }  
+            else  
+        {
+         $("#statussix").fadeTo(500,1, function() { $(this).html("Invalid pls enter a number like 0244153352").fadeTo(5000,0,function() {location.href="#pagesix"}); })
+    
+        return false;  
+        }  
+       }
+
+    function ValidateEmail()  
+        {  
+             var email=$("#myEmail").val();
+
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))  
+        { 
+            return (true)  
+        }  
+            $("#statussix").fadeTo(500,1, function() { $(this).html("Invalid email format").fadeTo(5000,0,function() {location.href="#pagesix"}); })
+            return (false)  
+
+    } 
+
+             
+             
+    function updateTime(){
+        var myId=$("#select-trip").val();	
+         var location=$("#select-location").val();
+         //alert(myId);
+           //alert(location);
+			var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=2&id="+location+"&tripname="+myId;
+                        console.log(u);
+		var r=syncAjax(u);		
+    }
+    
+    
+   function confirmationSms(){
+       alert("confirmationSms()");
+       var myEvent=$("#ename").val();
+        var u="http://50.63.128.135/~csashesi/class2015/esi-yeenuwa/iWasHereSome/events_action.php?cmd=4&code="+code+"&event="+myEvent;
+        alert(u);var r=syncAjax(u);
+        
+        console.log(u);
+   }
+	</script>
+</head> 
+ <body onload="initialize()">
+ 
+ 
+	 <div data-role="page" id="pageone" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#pageone" data-transition="slide" data-icon="home" data-iconpos="left"><h3>myEvents</h3></a></li>
+					</ul>
+				</div>
+			</div>
+       
+		
+	                 <div role="main" class="ui-content">
+	                    <form>
+	                        <div align="center">
+                                    
+	                          <div align="center">
+                                    <label for="email" > <strong>Email</strong></label>
+                                    <input type="text" name="email" id="email" placeholder="Enter your email" />
+                                  </div>
+                                    
+                                  <div align="center">
+                                    <label for="code" ><strong> Verification Code</strong></label>
+                                    <input type="text" name="code" id="code" placeholder="Enter your verification code here" />
+                                  </div>
+	                        </div>
+                                
+	                         <div align="center">
+                                    <label for="submit" ></label>
+                                    <input type="button" name="submit" value="Login" data-inline="true" onclick="checkUser()"/>
+	                         </div>
+                               
+	   `				 </form>
+                             <div align="center">
+                                 <a href="#pagesix" id="forgotten" data-role="buVon">First time user?</a>
+                             <br><br>
+                             
+                             </div><div align="center">
+                                <a href="#" id="barcodescanner" data-role="buVon" >Scan a bar code</a>
+                            </div>
+                           
+                             
+                             
+
+<p>Render in table</p>
+<div id="qrcodeTable"></div>
+<p>Render in canvas</p>
+<div id="qrcodeCanvas"></div>
+                             
+ <script>
+	//jQuery('#qrcode').qrcode("this plugin is great");
+	jQuery('#qrcodeTable').qrcode({
+		render	: "table",
+		text	: "http://jetienne.com"
+	});	
+	jQuery('#qrcodeCanvas').qrcode({
+		text	: "http://jetienne.com"
+	});	
+</script>                    
+                             <div id="status">
+                             </div>
+                             
+					</div>
+					
+					<div data-role="footer" data-position="fixed">
+						<h3>Droid-Ventors@AshSoftEng2014</h3>	
+					</div>
+	
+			</div> 
+
+     
+     
+     
+     
+      <div data-role="page" id="pagetwo" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#pageone" data-transition="slide" data-icon="home" data-iconpos="left">myEvent</a></li>
+					</ul>
+				</div>
+                            <div data-role="navbar">
+				<ul>
+				<li><a href="#pagetwo" class="ui-btn-active ui-state-persist">UP COMING EVENTS</a></li>
+				<li><a href="#pagethree" >MY EVENTS</a></li>
+                
+				</ul>
+                            </div>
+			</div>
+		
+	                  <div role="main" class="ui-content" data-position="fixed">
+            
+            
+                            <ul data-role="listview" id="listview">
+
+                                <li data-role="list-divider">
+
+                                </li>
+
+                            </ul>
+                           </div>
+					
+					<div data-role="footer" data-position="fixed">
+						<h3>Droid-Ventors@AshSoftEng2014</h3>	
+					</div>
+	
+			</div> 
+     
+     
+         <div data-role="page" id="pagethree" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				<h1>ASH TRANSIT</h1>
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#" data-transition="slide" data-icon="home" data-iconpos="left">Trip Details</a></li>
+					</ul>
+				</div>
+			</div>
+		
+	                  <div role="main" class="ui-content" data-position="fixed">
+            
+            
+            <ul data-role="listview" id="listview">
+				
+		<li data-role="list-divider">
+                    
+                </li>
+				
+            </ul>
+         </div>
+					
+					<div data-role="footer" data-position="fixed">
+						<h3>Droid-Ventors@AshSoftEng2014</h3>	
+					</div>
+	
+			</div> 
+     
+  
+          
+      <div data-role="page" id="pagefour" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				<h1>ASH TRANSIT</h1>
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#" data-transition="slide" data-icon="home" data-iconpos="left">Trip Details</a></li>
+					</ul>
+				</div>
+			</div>
+          
+          
+		
+	                  <div role="main" class="ui-content" data-position="fixed">
+                              
+                              	
+  	
+  <div data-role="collapsible">		
+  <h1>Set Time</h1>	
+ <div data-role="content">
+     <fieldset data-role="controlgroup">
+	                              
+     <label for="select-location">Select Current Location</label>
+     <select name="select-location" id="select-location">
+      
+                    <option>Select Conductor</option>
+	                <option value="1">Christ the King</option>
+	                <option value="2">37 Station</option>
+	                <option value="3">Accra Mall</option>
+                        <option value="4">Legon</option>
+	                <option value="5">Atomic Round About</option>
+	                <option value="6">Kwabenya</option>
+                        <option value="4">Abom Juction</option>
+	                <option value="5">Comet</option>
+	                <option value="9">Berekuso</option>
+                        <option value="10">Ashesi</option>
+     </select>                                 
+	</fieldset>
+     
+     
+          <fieldset data-role="controlgroup">
+	                              
+     <label for="select-trip">Trip Type</label>
+     <select name="select-trip" id="select-trip">
+        <option>Trip Type</option>
+        <option value="Ashesi-Christ the King">Ashesi-Christ the King</option>
+        <option value="Christ the King-Ashesi">Christ the King-Ashesi</option>
+     </select>                                 
+	</fieldset>
+      <div align="center">
+	<a href="#" data-role="button" data-inline="true" onclick="updateTime()"> Set Time</a>
+      </div>
+  </div>
+
+             
+    </div>
+ 
+  
+ <div data-role="collapsible">		
+  <h1>Booking List</h1>	
+ <div data-role="content">
+     
+               <div align="center">
+			<a href="#pagethree" data-role="button" data-inline="true" onclick="mylsit()"> View Reservations List</a>
+               </div>
+  </div>
+ </div>
+	</div> 				
+                    <div data-role="footer" data-position="fixed">
+                        <h3>Droid-Ventors@AshSoftEng2014</h3>	
+                    </div>
+	
+	</div>		
+     
+     
+     
+        
+         <div data-role="page" id="pagefive" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#" data-transition="slide" data-icon="home" data-iconpos="left">Trip Details</a></li>
+					</ul>
+				</div>
+			</div>
+		
+	                  <div role="main" class="ui-content" data-position="fixed">
+            
+            
+                
+  <div data-role="fieldcontain">
+    <label for="name">Event Name:</label>
+    <input type="text" name="ename" id="ename" value=""  />
+</div>
+ <div data-role="fieldcontain">
+    <label for="date">Event Date:</label>
+    <input type="text" name="date" id="date" value=""  />
+</div>
+  <div data-role="fieldcontain">
+    <label for="location">Event Location:</label>
+    <input type="text" name="location" id="location" value=""  />
+</div>
+  <div data-role="fieldcontain">
+    <label for="contact">Contact Number:</label>
+    <input type="text" name="contact" id="contact" value=""  />
+</div>
+ <div data-role="fieldcontain">
+    <label for="description">Event Description:</label>
+    <input type="text" name="description" id="description" value=""  />
+</div>
+                              <input type="button" value="Register" onclick="confirmationSms()">	
+
+     
+         </div>
+					
+					<div data-role="footer" data-position="fixed">
+						<h3>Droid-Ventors@AshSoftEng2014</h3>	
+					</div>
+	
+</div> 
+
+  
+     
+          
+         <div data-role="page" id="pagesix" data-theme="b">
+	              	<div data-role="header" data-position="fixed">		
+				<div data-role="navbar" data-position="fixed">
+					<ul>	
+						<li><a href="#" data-transition="slide" data-icon="home" data-iconpos="left">Trip Details</a></li>
+					</ul>
+				</div>
+			</div>
+		
+	                  <div role="main" class="ui-content" data-position="fixed">
+            
+            <h3>Registration</h3>
+                
+  <div data-role="fieldcontain" align="center">
+    <label for="name">Name:</label>
+    <input type="text" name="myName" id="myName" value=""  />
+</div>
+ <div data-role="fieldcontain" align="center">
+    <label for="date">Email</label>
+    <input type="text" name="mymail" id="myEmail" value=""  />
+</div>
+  <div data-role="fieldcontain" align="center">
+    <label for="location">Contact No</label>
+    
+    <input type="text" name="phoneNo" id="phoneNo" value="" maxlength="10" />
+
+  </div>
+  <div data-role="fieldcontain" align="center">
+    <label for="contact">Organisation</label>
+    <input type="text" name="organisation" id="organisation" value=""  />
+</div>
+ <div align="center">
+  <input type="button" value="Register" onclick="register()" data-inline="true"  >	
+</div>
+     
+         </div>
+             <div align="center">
+
+             <p> Call <a href="tel:+233543035331">303-5331</a> for instant assistance.</p>
+		
+            </div>
+             <br><br>
+             
+                <div id="statussix" align="center">
+                </div>
+             
+             <div data-role="footer" data-position="fixed">
+						<h3>Droid-Ventors@AshSoftEng2014</h3>	
+					</div>
+	
+</div> 
+     
+     
+</body>
+</html>
